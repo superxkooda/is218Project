@@ -52,7 +52,7 @@
 
 				public static function buildHtmlTable($titles, $results)
 				{
-					$table="<table boarder='1'>";
+					$table="<table class='table table-striped'";
 					 $a=mysql_fetch_assoc($results);
 					 if(sizeof($titles)!=sizeof($a))
 					 	die("your number of titles and colums do not match!\n");
@@ -247,26 +247,34 @@
 
 				class q7 extends page
 			{
-				public $name='home';
-
+				public $name='p7';
 				
 
 				function __destruct()
+
 				{
-					$this->page.='<p>Welcome to my home page</p>';
+					 $query="select schools.INSTNM, stats.NETASSET/ enrolment.EFYTOTLE as ASSETPER, stats.YEAR FROM stats  join schools on stats.UNITID = schools.UNITID join enrolment on stats.UNITID = enrolment.UNITID where stats.YEAR= enrolment.YEAR order by ASSETPER desc limit 10;";
+					$titles=["School","Assets Per Student", "Year"];
+
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
 			}
 
 				class q8 extends page
 			{
-				public $name='home';
+				public $name='q8';
 
 				
 
 				function __destruct()
 				{
-					$this->page.='<p>Welcome to my home page</p>';
+					$query="select schools.INSTNM, stats.LIABILITIES/ enrolment.EFYTOTLE as LIABPER, stats.YEAR FROM stats  join schools on stats.UNITID = schools.UNITID join enrolment on stats.UNITID = enrolment.UNITID where stats.YEAR= enrolment.YEAR ORDER BY LIABPER DESC limit 10;";
+					$titles=["School","Liabilities Per Student", "Year"];
+
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
 			}
@@ -292,35 +300,46 @@
 
 				function __destruct()
 				{
-					$this->page.='<p>Welcome to my home page</p>';
 					page::__destruct();	
 				}
 			}
 
-	class q11 extends page
+			class q11 extends page
 			{
-				public $name='home';
+				public $name='q11';
 
 				
 
 				function __destruct()
 				{
-					$this->page.='<p>Welcome to my home page</p>';
+					$query="select schools.INSTNM, a.LIABILITIES as liabilities, a.YEAR as year ,b.LIABILITIES, b.YEAR, ((b.LIABILITIES-a.LIABILITIES)/a.LIABILITIES)*100 AS DIFF from stats a INNER join schools on a.UNITID= schools.UNITID inner join stats b on a.UNITID=b.UNITID WHERE a.YEAR=2010 AND b.YEAR=2011 ORDER BY DIFF DESC limit 10;";
+					$titles=["School","\$Liabilities", "Year", "\$Liabilities", "Year", "%Increase"];
+
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
 			}
-				class q12 extends page
+			
+			class q12 extends page
 			{
-				public $name='home';
+				public $name='q12';
 
 				
 
 				function __destruct()
 				{
-					$this->page.='<p>Welcome to my home page</p>';
+					$query="select schools.INSTNM, a.EFYTOTLE as efytotle, a.YEAR AS year, b.EFYTOTLE, b.YEAR, ((b.EFYTOTLE-a.EFYTOTLE)/a.EFYTOTLE)*100 AS DIFF FROM enrolment a inner join schools on  a.UNITID= schools.UNITID inner join enrolment b on a.UNITID=b.UNITID WHERE a.YEAR=2010 AND b.YEAR=2011 ORDER BY DIFF DESC limit 10;";
+
+					$titles=["School","Students", "Year", "Students", "Year", "%Increase"];
+
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
+
 			}
+
 
 		
 
