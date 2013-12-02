@@ -14,14 +14,14 @@
 			<?php 
 
 			require_once('./dbpw.php'); //holds login cridentials for mysql database
-			/*looks like 
-	class dbpw
-	{
-		public static $hostname;
-		public static $database;
-		public static $username;
-		public static $password;
-	}*/
+												/*looks like 
+										class dbpw
+										{
+											public static $hostname;
+											public static $database;
+											public static $username;
+											public static $password;
+										}*/
 			class db extends dbpw
 			{
 				public static function connect()
@@ -49,11 +49,41 @@
 					else
 						echo "bad query!" . mysql_error();
 				}
+
+				public static function buildHtmlTable($titles, $results)
+				{
+					$table="<table boarder='1'>";
+					 $a=mysql_fetch_assoc($results);
+					 if(sizeof($titles)!=sizeof($a))
+					 	die("your number of titles and colums do not match!\n");
+						else
+						{
+							$x=sizeof($titles);
+							$table.="<tr>";
+							for ($i=0; $i < $x; $i++) 
+							{ 
+								$table.="<th>".$titles[$i]."</th>";
+							}
+							$table.="</tr>";
+
+							do
+							{
+								$table.="<tr>";
+								foreach ($a as $value) {
+									$table.="<td>$value</td>";
+								}
+								$table.="</tr>";
+
+							} while($a=mysql_fetch_assoc($results));
+
+							$table.="</table>";
+
+							return $table;
+						}
+				}
 			}
 
-
-			$test=mysql_fetch_assoc (db::query("select * from schools limit 10"));
-			print_r($test);
+		
 
 
 
@@ -65,9 +95,7 @@
 
 					$page = isset($_POST['mode']) ? $_POST['mode'] : isset($_REQUEST['page'])? $_REQUEST['page'] : "home";
   // $arg = $_REQUEST['arg'];
-					echo $page;
 					$page = new $page();	
-					print_r($_POST);
 
 				}
 
@@ -82,9 +110,9 @@
 			//base page element
 			abstract class page
 			{				//classname => link name
-			 	protected $menu = array('home' => 'Home' , 'login' => 'Login',
-			 				 'create' => 'Create Account','transInfo'=>'Transaction Info', /*'forgotPass' => 'Forgot Password',*/ //easy removal of menu items 
-			 				 'trans' => 'Transactions' );
+			 	protected $menu = array('home' => 'Home' , 'q1' => 'q1','q2' => 'q2',
+			 		'q3' => 'q3','q5' => 'q5','q6' => 'q6','q7' => 'q7',
+			 		'q8' => 'q8','q9' => 'q9','q10' => 'q10','q11' => 'q11','q12' => 'q12' );
 
 			 	protected $page ="<div class='container'>";
 
@@ -112,7 +140,6 @@
 					echo $this->page;
 
 				}
-
 			}
 
 			class home extends page 
@@ -127,196 +154,175 @@
 					page::__destruct();	
 				}
 			}
+			
 
-			class login extends page  
+			class q1 extends page
 			{
-				public $name='login';
-				
-				function __destruct()
-				{ //lets build our form
-					$this->page.="
-							<div class='col-md-4' style='margin:0 auto; float:none;'>
-								<form  class='form-horizontal' role='form' method='post'>
-									<input type='hidden' name='mode' value='validate'/>
-									<div class='form-group'>
-									<input id='username' class='form-control' type='text' placeholder='Username' name='username'/>
-									</div>
-									<div class='form-group'>
-									<input id='password' class='form-control' type='password' placeholder='Password' name='password'/>
-									</div>
+				public $name='';
+				//Create a web page that shows the colleges that have the highest enrollment
 
-									<input class='btn btn-default' type='submit'/>
-									<a href='?page=forgotPass' style='float:right;'>Forgot Password?</a>
-								 </form>
-							</div>";
-
-					page::__destruct();	
-
-				}
-
-			}
-
-			class create extends page 
-			{
-				public $name='create';
-				
 				function __destruct()
 				{
-					$this->page.="
-					<div class='col-md-4' style='margin:0 auto; float:none;'>
-								<form  class='form-horizontal' role='form' method='post'>
-									<input type='hidden' name='mode' value='newAccount'/>
-									<div class='form-group'>
-									<input id='username' class='form-control' type='text' placeholder='Username' name='username'/>
-									</div>
-									<div class='form-group'>
-									<input id='email' class='form-control' type='email' placeholder='Email' name='email'/>
-									<input id='email' class='form-control' type='email' placeholder='Repeat Email' name='rEmail'/>
-									</div>
-									<div class='form-group'>
-									<input id='password' class='form-control' type='password' placeholder='Password' name='password'/>
-									<input id='rPassword' class='form-control' type='password' placeholder='Repeat Password' name='rPassword'/>
-									</div>
-
-									<input class='btn btn-default' type='submit'/>
-								 </form>
-							</div>";;
+					$query="select schools.INSTNM, enrolment.EFYTOTLE, enrolment.YEAR FROM enrolment ".
+				" join schools on enrolment.UNITID=schools.UNITID "
+				. " order by enrolment.EFYTOTLE desc limit 10;";
+				$titles=["School","Enrolment", "Year"];
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
+					//$this->page.=print_r(mysql_fetch_assoc($results));
 					page::__destruct();	
 				}
-
 			}
-
-			class forgotPass extends page 
+				class q2 extends page
 			{
-				public $name='forgotPass';
-				
-				function __destruct()
-				{
-					$this->page.="
-								<div class='col-md-4' style='margin:0 auto; float:none;'>
-								<h2>Please enter in your email.</h2>
-									<form  class='form-horizontal' role='form' method='post'>
-									<input type='hidden' name='mode' value='forgotPassConf'/>
-										<div class='form-group'>
-											<input id='email' class='form-control' type='Email' placeholder='Email' name='email'/>
-										</div>
-										<div class='form-group'>
-											<input class='btn btn-default' type='submit'/>
-										</div>
-									</form>
-								</div>
-
-					";
-					page::__destruct();	
-				}
-
-			}
-
-			class transInfo extends page 
-			{
-				public $name='transInfo';
+				public $name='q2';
 
 				
+
 				function __destruct()
 				{
-					$this->page.="
-								<div class='col-md-4' style='margin:0 auto; float:none;'>
-
-									<h2>Transaction Info</h2>
-									<table border=1>
-											<tr><th>Date</th><th>Source</th><th>Destenation</th><th>Type</th><th>Amount</th></tr>
-											<tr><td>NOW</td><td>./*</td><td>/home/me/</td><td>cp</td><td>^*.$</td></tr>
-									</table>
-								</div>
-					";
+					$query="select schools.INSTNM, stats.LIABILITIES, stats.YEAR ".
+					"from stats join schools on stats.UNITID = schools.UNITID ".
+					"order by LIABILITIES desc limit 10;";
+					$titles=["School","Liabilities", "Year"];
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
-
 			}
 
-
-	class trans extends page 
+				class q3 extends page
 			{
-				public $name='Trans';
+				public $name='q3';
 
 				
+
 				function __destruct()
 				{
-					$this->page.="
-								<div class='col-md-4' style='margin:0 auto; float:none;'>
-									<h2>Please enter an amount.</h2>
-									<form  class='form-horizontal' role='form' method='post'>
-									<input type='hidden' name='mode' value='transConf'/>
-									<div class='form-group'>
-											<select class='form-control' style='width:100px'>
-												<option>Credit</option>
-												<option>Debit</option>
-											</select>
-										</div>
-										<div class='form-group'>
-											<input id='transAmount' class='form-control' type='text' placeholder='$$$' name='transAmount'/>
-										</div>
-										<div class='form-group'>
-											<input class='btn btn-default' type='submit'/>
-										</div>
-									</form>
-								</div>
+					$query="select schools.INSTNM, enrolment.EFYTOTLE, enrolment.YEAR FROM enrolment  join schools on enrolment.UNITID=schools.UNITID  order by enrolment.EFYTOTLE desc limit 10;";
 
 
-					";
+					$titles=["School","Assets", "Year"];
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
 					page::__destruct();	
 				}
-
 			}
 
-		class validate extends page 
-		//validates a user when they log in
-		{
-			public $name='validate';
-			function __construct()
+			
+
+				class q5 extends page
 			{
-				page::__construct();
-				echo $this->name;
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$query="select schools.INSTNM, stats.TOTALREV, stats.YEAR from stats join schools on stats.UNITID = schools.UNITID order by stats.TOTALREV desc limit 10;";
+
+					$titles=["School","Revenues", "Year"];
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
+					page::__destruct();	
+				}
 			}
-		}
 
-
-		class newAccount extends page
-		//checks to see if the account is available then gives the proper feedback
-		{
-
-			public $name='newAccount';
-			function __construct()
+				class q6 extends page
 			{
-				page::__construct();
-				echo $this->name;
+				public $name='q6';
+
+				
+
+				function __destruct()
+				{
+					$query = "select schools.INSTNM, stats.TOTALREV/ enrolment.EFYTOTLE as REVPER, stats.YEAR FROM stats  join schools on stats.UNITID = schools.UNITID join enrolment on stats.UNITID = enrolment.UNITID where stats.YEAR= enrolment.YEAR  order by REVPER desc limit 10;";
+					$titles=["School","Revenues Per Student", "Year"];
+					$results=db::query($query);
+					$this->page.=db::buildHtmlTable($titles,$results);
+					page::__destruct();	
+				}
 			}
-		}
+			
+
+				class q7 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+
+				class q8 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+
+				class q9 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+
+				class q10 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+
+	class q11 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+				class q12 extends page
+			{
+				public $name='home';
+
+				
+
+				function __destruct()
+				{
+					$this->page.='<p>Welcome to my home page</p>';
+					page::__destruct();	
+				}
+			}
+
 		
-
-		class transConf extends page
-		//conferms the transaction was processed
-		{
-			public $name='transConf';
-			function __construct()
-			{
-				page::__construct();
-				echo $this->name;
-			}
-		}
-
-		class forgotPassConf
-		//conferms the forgotten password submission
-		{
-		public	$name='forgotPassConf';
-			function __construct()
-			{
-				page::__construct();
-				echo $this->name;
-			}
-		}
-
-
 
 			?>
 		</body>
