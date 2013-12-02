@@ -12,16 +12,51 @@
 			
 
 			<?php 
-			require_once 'db.php';
 
-/*db.php has a class that looks like 
-	class db
+			require_once('./dbpw.php'); //holds login cridentials for mysql database
+			/*looks like 
+	class dbpw
 	{
-		public static hostname;
-		public static database;
-		public static username;
-		public static password;
+		public static $hostname;
+		public static $database;
+		public static $username;
+		public static $password;
 	}*/
+			class db extends dbpw
+			{
+				public static function connect()
+				{
+					$db_server = mysql_connect(self::$hostname, self::$username, self::$password); //loging onto server with error cheching
+					if (!$db_server) die("unable to connect to server!" .mysql_error()); 
+					// echo "connected to db <br/> ---------------------------------- <br/>";
+					mysql_select_db(self::$database)
+					or die("unable to select database! " . mysql_error()); 
+					// echo "database selected <br/>-----------------------------------<br/>";
+					return $db_server;
+				}
+	
+				public static function close($db)//just a shorthand for closing db
+				{
+					mysql_close($db);
+				}
+
+				public static function query($query)//not very creative but should do the trick
+				{
+					$db = self::connect();
+					$results= mysql_query($query);
+					if($results)
+						return $results;
+					else
+						echo "bad query!" . mysql_error();
+				}
+			}
+
+
+			$test=mysql_fetch_assoc (db::query("select * from schools limit 10"));
+			print_r($test);
+
+
+
 			$program = new program();
 
 			 class program {
