@@ -287,7 +287,7 @@
 
 				function __destruct()
 				{
-					$this->page.="<p>this is where $this.name should be</p>";
+					$this->page.="<p>this is where $this->name should be</p>";
 					page::__destruct();	
 				}
 			}
@@ -300,7 +300,7 @@
 
 				function __destruct()
 				{
-					$this->page.="<p>this is where $this.name should be</p>";
+					$this->page.="<p>this is where $this->name should be</p>";
 					page::__destruct();	
 				}
 			}
