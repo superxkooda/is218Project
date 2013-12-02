@@ -12,7 +12,16 @@
 			
 
 			<?php 
+			require_once 'db.php';
 
+/*db.php has a class that looks like 
+	class db
+	{
+		public static hostname;
+		public static database;
+		public static username;
+		public static password;
+	}*/
 			$program = new program();
 
 			 class program {
