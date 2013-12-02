@@ -158,7 +158,7 @@
 
 			class q1 extends page
 			{
-				public $name='';
+				public $name='q1';
 				//Create a web page that shows the colleges that have the highest enrollment
 
 				function __destruct()
@@ -213,7 +213,7 @@
 
 				class q5 extends page
 			{
-				public $name='home';
+				public $name='q5';
 
 				
 
@@ -281,25 +281,26 @@
 
 				class q9 extends page
 			{
-				public $name='home';
+				public $name='q9';
 
 				
 
 				function __destruct()
 				{
-					$this->page.='<p>Welcome to my home page</p>';
+					$this->page.="<p>this is where $this.name should be</p>";
 					page::__destruct();	
 				}
 			}
 
 				class q10 extends page
 			{
-				public $name='home';
+				public $name='q10';
 
 				
 
 				function __destruct()
 				{
+					$this->page.="<p>this is where $this.name should be</p>";
 					page::__destruct();	
 				}
 			}
